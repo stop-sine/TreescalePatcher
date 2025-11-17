@@ -9,7 +9,10 @@ namespace TreescalePatcher
 {
     public class Settings
     {
-        public FormKey MyFormKey;
+        [SynthesisOrder]
+        [SynthesisSettingName("Exclude FormIDs")]
+        [SynthesisTooltip("Testing.")]
+        public IEnumerable<FormKey>? MyFormKey;
         [SynthesisOrder]
         [SynthesisSettingName("Exclude")]
         [SynthesisTooltip("Test.")]
