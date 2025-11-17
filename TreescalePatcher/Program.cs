@@ -1,11 +1,16 @@
+using Noggog;
 using Mutagen.Bethesda;
 using Mutagen.Bethesda.Synthesis;
 using Mutagen.Bethesda.Skyrim;
+using Mutagen.Bethesda.Plugins;
 
 namespace TreescalePatcher
 {
     public class Program
     {
+        private static Lazy<Settings> _patcherSettings = null!;
+        private static Settings PatcherSettings => _patcherSettings.Value;
+
         public static async Task<int> Main(string[] args)
         {
             return await SynthesisPipeline.Instance
@@ -16,7 +21,57 @@ namespace TreescalePatcher
 
         public static void RunPatch(IPatcherState<ISkyrimMod, ISkyrimModGetter> state)
         {
-            //Your code here!
+            var cache = state.LinkCache;
+            var patch = state.PatchMod;
+            var test = PatcherSettings.Trees;
+
+            var treescale = ModKey.FromFileName("Treescale.esm");
+
+            // Get all placed objects from Treescale.esm
+            var treescalePlacedObjects = state.LoadOrder.PriorityOrder
+                .Where(m => m.ModKey == treescale)
+                .PlacedObject()
+                .WinningOverrides();
+
+            var conflicts = 0;
+            var patched = 0;
+
+            foreach (var treescalePlacedObject in treescalePlacedObjects)
+            {
+                // Get all overrides for this record across the load order
+                var contexts = cache.ResolveAllContexts<IPlacedObject, IPlacedObjectGetter>(treescalePlacedObject.FormKey).ToList();
+
+                if (contexts.Count < 2) continue; // Need at least Treescale + one override
+
+                var baseContext = contexts.Last();
+                var winningContext = contexts[0]; // First is winning override
+                var treescaleContext = contexts.FirstOrDefault(c => c.ModKey == treescale);
+
+                if (treescaleContext == null) continue;
+                if (winningContext.ModKey == treescale) continue; // No conflict if Treescale is winning
+
+                var baseRecord = baseContext.Record;
+                var winningRecord = winningContext.Record;
+                var treescaleRecord = treescaleContext.Record;
+
+                conflicts++;
+
+                // Check if scales differ (indicating a conflict)
+                if (baseRecord.Scale is not null && winningRecord.Scale is not null && MathF.Abs(winningRecord.Scale.Value - baseRecord.Scale.Value) > 0.001f)
+                {
+                    Console.WriteLine($"Conflict: {winningRecord.FormKey}");
+                    Console.WriteLine($"  Treescale.esm: {treescaleRecord.Scale}, {winningContext.ModKey.FileName}: {winningRecord.Scale}");
+                    // Could patch here if desired
+                }
+                else
+                {
+                    // Scales match, but could apply Treescale scale to ensure consistency
+                    winningContext.GetOrAddAsOverride(patch).Scale = treescaleRecord.Scale;
+                    patched++;
+                }
+            }
+
+            Console.WriteLine($"Found {conflicts} conflicts\nPatched {patched} trees");
         }
     }
 }
