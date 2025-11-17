@@ -30,8 +30,6 @@ namespace TreescalePatcher
 
             var treescale = ModKey.FromFileName("Treescale.esm");
 
-
-
             // Get all placed objects from Treescale.esm
             var treescalePlacedObjects = state.LoadOrder.PriorityOrder
                 .Where(m => m.ModKey == treescale)
