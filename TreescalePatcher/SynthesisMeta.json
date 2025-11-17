@@ -1,9 +1,15 @@
 {
   "Nickname": "TreescalePatcher",
   "Visibility": "Visible",
-  "OneLineDescription": "Forward tree scale edits from Happy Little Trees",
+  "OneLineDescription": "Forwards scale edits from Treescale.esm in Happy Little Trees",
   "LongDescription": "",
   "PreferredAutoVersioning": "Default",
-  "RequiredMods": ["Treescale.esm"],
-  "TargetedReleases": ["SkyrimSE", "SkyrimVR", "SkyrimSEGog"]
+  "RequiredMods": [
+    "Treescale.esm"
+  ],
+  "TargetedReleases": [
+    "SkyrimSE",
+    "SkyrimVR",
+    "SkyrimSEGog"
+  ]
 }
