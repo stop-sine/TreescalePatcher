@@ -10,8 +10,8 @@ namespace TreescalePatcher
         [SynthesisOrder]
         [SynthesisSettingName("Exclude")]
         [SynthesisTooltip("Test.")]
-        [FormLinkPickerCustomization(typeof(IPlacedObjectGetter))]
-        public IFormLinkGetter<IArmorGetter> Trees = FormLink<IArmorGetter>.Null;
+        //[FormLinkPickerCustomization(typeof(IPlacedObjectGetter))]
+        public IFormLinkGetter<IPlacedObjectGetter> Trees = FormLink<IPlacedObjectGetter>.Null;
         //public IFormLinkGetter Trees { get; set; } = FormLinkInformation.Null;
     }
 }
