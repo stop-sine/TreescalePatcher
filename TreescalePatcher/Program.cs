@@ -27,15 +27,23 @@ namespace TreescalePatcher
         {
             var cache = state.LinkCache;
             var patch = state.PatchMod;
-            var test = PatcherSettings.Trees;
 
             var treescale = ModKey.FromFileName("Treescale.esm");
+
+
 
             // Get all placed objects from Treescale.esm
             var treescalePlacedObjects = state.LoadOrder.PriorityOrder
                 .Where(m => m.ModKey == treescale)
                 .PlacedObject()
-                .WinningOverrides();
+                .WinningOverrides()
+                .ToList();
+
+            var ignored = PatcherSettings.Ignored?.ToList();
+            if (ignored is not null && ignored?.Count > 0)
+            {
+                treescalePlacedObjects = [.. treescalePlacedObjects.Where(r => !ignored.Contains(r.FormKey))];
+            }
 
             var conflicts = 0;
             var patched = 0;
